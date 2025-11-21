@@ -230,6 +230,23 @@ python -m unittest tests.test_transformer -v
 ```python
 import tensorflow as tf
 from src import Transformer, train_step, greedy_decode, create_masks
+from src.data_preprocessing import build_vocab, encode_sequence, simple_tokenize
+
+# Example: Working with English text
+source_text = "the quick brown fox jumps"
+target_text = "the quick brown fox jumps over"
+
+# Build vocabulary from the texts
+vocab = build_vocab([source_text, target_text], level='word', min_freq=1)
+print(f"Vocabulary: {vocab}")
+# Output: {'<PAD>': 0, '<START>': 1, '<END>': 2, '<UNK>': 3, 'the': 4, 'quick': 5, ...}
+
+# Tokenize and encode sequences
+src_tokens = simple_tokenize(source_text, level='word')
+tgt_tokens = simple_tokenize(target_text, level='word')
+
+src_encoded = encode_sequence(src_tokens, vocab, max_len=10)
+tgt_encoded = encode_sequence(tgt_tokens, vocab, max_len=10)
 
 # Create model
 model = Transformer(
@@ -237,8 +254,8 @@ model = Transformer(
     d_model=64,
     num_heads=4,
     ffn_dim=128,
-    src_vocab_size=100,
-    tgt_vocab_size=100,
+    src_vocab_size=len(vocab),
+    tgt_vocab_size=len(vocab),
     max_len=50,
     pos_encoding_type="sinusoidal",
     dropout_rate=0.1
@@ -247,18 +264,31 @@ model = Transformer(
 # Create optimizer
 optimizer = tf.keras.optimizers.Adam(1e-3)
 
-# Training example
-src = tf.constant([[1, 2, 3, 4, 5, 0, 0, 0, 0, 0]], dtype=tf.int32)
-tgt_inp = tf.constant([[1, 1, 2, 3, 4, 0, 0, 0, 0, 0]], dtype=tf.int32)
-tgt_real = tf.constant([[1, 2, 3, 4, 5, 0, 0, 0, 0, 0]], dtype=tf.int32)
+# Training example with word sequences
+# Source: "the quick brown fox jumps" -> [4, 5, 6, 7, 8, 0, 0, 0, 0, 0]
+# Target input (shifted): "<START> the quick brown fox" -> [1, 4, 5, 6, 7, 0, 0, 0, 0, 0]
+# Target real: "the quick brown fox jumps over" -> [4, 5, 6, 7, 8, 9, 0, 0, 0, 0]
+src = tf.constant([src_encoded], dtype=tf.int32)
+tgt_inp = tf.constant([[vocab['<START>']] + tgt_encoded[:-1].tolist()], dtype=tf.int32)
+tgt_real = tf.constant([tgt_encoded], dtype=tf.int32)
 
 loss = train_step(model, src, tgt_inp, tgt_real, optimizer)
 print(f"Loss: {loss.numpy()}")
 
-# Inference example
-src_seq = [1, 2, 3, 4, 5]
-decoded = greedy_decode(model, src_seq, start_token=1, end_token=2, max_len=20)
-print(f"Decoded: {decoded}")
+# Inference example: decode from source sequence
+src_seq = src_encoded.tolist()
+decoded_ids = greedy_decode(
+    model, 
+    src_seq, 
+    start_token=vocab['<START>'], 
+    end_token=vocab['<END>'], 
+    max_len=20
+)
+
+# Convert decoded IDs back to words
+id_to_word = {v: k for k, v in vocab.items()}
+decoded_words = [id_to_word.get(id, '<UNK>') for id in decoded_ids if id != vocab['<PAD>']]
+print(f"Decoded: {' '.join(decoded_words)}")
 ```
 
 ## Configuration
