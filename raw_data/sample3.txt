@@ -1,0 +1,5 @@
+Python is a popular programming language for data science and machine learning.
+TensorFlow and PyTorch are widely used deep learning frameworks.
+Gradient descent is an optimization algorithm for training neural networks.
+Backpropagation computes gradients efficiently through the computational graph.
+

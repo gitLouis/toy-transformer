@@ -46,4 +46,5 @@ htmlcov/
 checkpoints/
 *.h5
 *.ckpt
+models/
 

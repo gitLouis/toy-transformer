@@ -37,7 +37,9 @@ toy-transformer/
 │   ├── transformer.py         # Full Transformer model
 │   ├── masks.py               # Mask creation utilities
 │   ├── training.py            # Loss function & training step
-│   └── inference.py           # Greedy decoding
+│   ├── inference.py           # Greedy decoding
+│   ├── data_preprocessing.py  # Text preprocessing utilities
+│   └── model_utils.py         # Model save/load utilities
 ├── tests/
 │   ├── test_layers.py
 │   ├── test_positional_encoding.py
@@ -48,10 +50,16 @@ toy-transformer/
 │   ├── test_masks.py
 │   ├── test_training.py
 │   └── test_inference.py
-├── requirements.txt           # Python dependencies
-├── Dockerfile                 # Docker configuration
+├── raw_data/                 # Example text files for training
+│   ├── sample1.txt
+│   ├── sample2.txt
+│   └── sample3.txt
+├── models/                   # Saved trained models (created after training)
+├── train.py                  # Training script
+├── requirements.txt          # Python dependencies
+├── Dockerfile                # Docker configuration
 ├── setup_venv.sh             # Virtual environment setup script
-└── README.md                  # This file
+└── README.md                 # This file
 ```
 
 ## Installation
@@ -87,6 +95,37 @@ toy-transformer/
    ```
 
 ## Usage
+
+### Installation
+
+First, install the required dependencies:
+
+```bash
+# Using pip
+pip install -r requirements.txt
+
+# Or using the setup script (creates virtual environment)
+bash setup_venv.sh
+```
+
+### Training a Model
+
+To train a model on the example text files:
+
+```bash
+python train.py
+```
+
+This will:
+1. Load text files from `raw_data/`
+2. Preprocess the data (tokenize and build vocabulary)
+3. Train a Transformer model
+4. Save the trained model to `models/` directory
+
+The saved model includes:
+- Model weights (`transformer_model/`)
+- Vocabulary mapping (`vocab.json`)
+- Model configuration (`config.json`)
 
 ### Running Unit Tests
 
