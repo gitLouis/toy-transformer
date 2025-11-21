@@ -1,5 +1,0 @@
-The quick brown fox jumps over the lazy dog. This is a simple sentence for training.
-Machine learning models need data to learn patterns and make predictions.
-Natural language processing helps computers understand human language.
-Transformers are powerful neural network architectures for sequence modeling.
-

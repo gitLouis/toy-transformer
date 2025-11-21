@@ -34,11 +34,11 @@ class GutenbergDownloader:
     
     # Base URL templates
     TOP_BOOKS_URL = 'http://www.gutenberg.org/browse/scores/top'
-    BOOK_FILE_URL_TEMPLATE = Template('http://www.gutenberg.org/files/$book_id/$book_id.txt')
+    BOOK_FILE_URL_TEMPLATE = Template('https://www.gutenberg.org/cache/epub/$book_id/pg$book_id.txt')
     
     # Request settings
     REQUEST_TIMEOUT = 30  # seconds
-    REQUEST_DELAY = 1.0   # seconds between requests (be polite to server)
+    REQUEST_DELAY = 120.0  # seconds between requests (2 minutes - be polite to server)
     
     def __init__(self, download_dir: str = 'raw_data/gutenberg'):
         """
@@ -147,9 +147,10 @@ class GutenbergDownloader:
         filename = self._clean_filename(book_name)
         filepath = self.download_dir / f"{filename}.txt"
         
-        # Skip if already exists
+        # Check if file already exists
         if filepath.exists():
-            logger.info(f"Skipping {book_name} (already exists)")
+            logger.warning(f"File already exists: {filepath}")
+            logger.warning(f"Skipping download of '{book_name}' (ID: {book_id})")
             return True
         
         try:
@@ -294,8 +295,11 @@ class GutenbergDownloader:
             if self._download_book(book_id, book_name):
                 success_count += 1
             
-            # Be polite: delay between requests
+            # Be polite: delay between requests (2 minutes to respect server)
             if i < len(books):
+                wait_minutes = int(self.REQUEST_DELAY // 60)
+                wait_seconds = int(self.REQUEST_DELAY % 60)
+                logger.info(f"Waiting {wait_minutes}m {wait_seconds}s before next download...")
                 time.sleep(self.REQUEST_DELAY)
         
         logger.info(f"Download complete: {success_count}/{len(books)} books downloaded")

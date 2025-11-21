@@ -41,8 +41,8 @@ def load_model(model_dir: str) -> tuple:
         dropout_rate=config['dropout_rate']
     )
     
-    # Load weights
-    weights_path = os.path.join(model_dir, 'transformer_model')
+    # Load weights (Keras 3 uses .weights.h5 extension)
+    weights_path = os.path.join(model_dir, 'transformer_model.weights.h5')
     model.load_weights(weights_path)
     
     return model, vocab, config

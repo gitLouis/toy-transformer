@@ -57,7 +57,8 @@ toy-transformer/
 │   └── sample3.txt
 ├── models/                   # Saved trained models (created after training)
 ├── train.py                  # Training script
-├── download_gutenberg.py     # Gutenberg book downloader script
+├── download_gutenberg.py     # Gutenberg book downloader script (Python)
+├── download_gutenberg_wget.sh # Gutenberg bulk downloader (wget, recommended)
 ├── requirements.txt          # Python dependencies
 ├── Dockerfile                # Docker configuration
 ├── setup_venv.sh             # Virtual environment setup script
@@ -112,7 +113,29 @@ bash setup_venv.sh
 
 ### Downloading Books from Project Gutenberg
 
-To download books for training:
+There are two methods to download books:
+
+#### Method 1: Using wget (Recommended for bulk downloads)
+
+This uses Project Gutenberg's official robot/harvest endpoint, which is the recommended method for bulk downloads:
+
+```bash
+# Download all English text files
+./download_gutenberg_wget.sh raw_data/gutenberg
+
+# Or with default directory
+./download_gutenberg_wget.sh
+```
+
+This method:
+- Uses Project Gutenberg's official bulk download endpoint
+- Respects their terms of service for automated downloads
+- Downloads all English text files
+- Waits 2 seconds between requests
+
+#### Method 2: Using Python script (Top books only)
+
+To download specific top books:
 
 ```bash
 # Download top 5 books
@@ -131,19 +154,59 @@ from src import download_top_k
 download_top_k(k=5, download_dir='raw_data/gutenberg')
 ```
 
+**Note:** The Python script requires user approval for downloads > 3 books and waits 2 minutes between downloads to respect server resources.
+
 ### Training a Model
 
-To train a model on the example text files:
+#### Quick Start: Full Training Cycle on Gutenberg Books
+
+For a complete training cycle on Gutenberg books:
 
 ```bash
-python train.py
+# Option 1: Use the automated script (recommended)
+./train_gutenberg.sh
+
+# Option 2: Manual steps
+# 1. Download books
+./download_gutenberg_wget.sh raw_data/gutenberg
+# or
+python download_gutenberg.py --k 10 --dir raw_data/gutenberg
+
+# 2. Train the model
+python train.py --data_dir raw_data/gutenberg --model_dir models
 ```
 
-This will:
-1. Load text files from `raw_data/`
-2. Preprocess the data (tokenize and build vocabulary)
-3. Train a Transformer model
-4. Save the trained model to `models/` directory
+#### Training with Custom Options
+
+```bash
+# Train with custom parameters
+python train.py \
+    --data_dir raw_data/gutenberg \
+    --model_dir models \
+    --num_epochs 20 \
+    --batch_size 8 \
+    --max_len 100 \
+    --d_model 128 \
+    --num_heads 8 \
+    --num_layers 4
+```
+
+#### Training on Custom Data
+
+To train on your own text files:
+
+```bash
+# Place .txt files in a directory, then:
+python train.py --data_dir my_text_files --model_dir my_models
+```
+
+#### What the Training Script Does
+
+1. Loads text files from the specified directory
+2. Preprocesses the data (tokenize and build vocabulary)
+3. Creates a Transformer model
+4. Trains the model on the preprocessed data
+5. Saves the trained model to the specified directory
 
 The saved model includes:
 - Model weights (`transformer_model/`)

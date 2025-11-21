@@ -1,0 +1,17 @@
+--2025-11-21 11:02:19--  https://www.gutenberg.org/robot/harvest?filetypes[]=txt&langs[]=en
+Resolving www.gutenberg.org (www.gutenberg.org)... 152.19.134.47
+Connecting to www.gutenberg.org (www.gutenberg.org)|152.19.134.47|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/html]
+Saving to: ‘harvest?filetypes[]=txt&langs[]=en’
+
+     0K .......... ..                                          26.5M=0s
+
+2025-11-21 11:02:19 (26.5 MB/s) - ‘harvest?filetypes[]=txt&langs[]=en’ saved [12425]
+
+FINISHED --2025-11-21 11:02:19--
+Total wall clock time: 0.3s
+Downloaded: 1 files, 12K in 0s (26.5 MB/s)
+Converting links in harvest?filetypes[]=txt&langs[]=en... 1.
+0-1
+Converted links in 1 files in 0.002 seconds.

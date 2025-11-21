@@ -1,5 +1,0 @@
-Deep learning has revolutionized artificial intelligence in recent years.
-Neural networks can learn complex patterns from large amounts of data.
-Attention mechanisms allow models to focus on relevant parts of input.
-The encoder-decoder architecture is useful for translation tasks.
-

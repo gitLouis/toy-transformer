@@ -142,8 +142,8 @@ def save_model(model: Transformer, vocab: dict, save_dir: str, config: dict):
     """
     os.makedirs(save_dir, exist_ok=True)
     
-    # Save model weights
-    model_path = os.path.join(save_dir, 'transformer_model')
+    # Save model weights (Keras 3 requires .weights.h5 extension)
+    model_path = os.path.join(save_dir, 'transformer_model.weights.h5')
     model.save_weights(model_path)
     print(f"Model weights saved to {model_path}")
     
@@ -164,25 +164,48 @@ def save_model(model: Transformer, vocab: dict, save_dir: str, config: dict):
 
 def main():
     """Main training pipeline."""
+    import argparse
+    
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Train Transformer on text data')
+    parser.add_argument('--data_dir', type=str, default='raw_data',
+                       help='Directory containing text files (default: raw_data)')
+    parser.add_argument('--model_dir', type=str, default='models',
+                       help='Directory to save trained model (default: models)')
+    parser.add_argument('--num_epochs', type=int, default=10,
+                       help='Number of training epochs (default: 10)')
+    parser.add_argument('--batch_size', type=int, default=4,
+                       help='Batch size (default: 4)')
+    parser.add_argument('--max_len', type=int, default=50,
+                       help='Maximum sequence length (default: 50)')
+    parser.add_argument('--d_model', type=int, default=64,
+                       help='Model dimension (default: 64)')
+    parser.add_argument('--num_heads', type=int, default=4,
+                       help='Number of attention heads (default: 4)')
+    parser.add_argument('--num_layers', type=int, default=2,
+                       help='Number of encoder/decoder layers (default: 2)')
+    
+    args = parser.parse_args()
+    
     # Configuration
     config = {
-        'num_layers': 2,
-        'd_model': 64,
-        'num_heads': 4,
-        'ffn_dim': 128,
+        'num_layers': args.num_layers,
+        'd_model': args.d_model,
+        'num_heads': args.num_heads,
+        'ffn_dim': args.d_model * 2,  # Typically 2-4x d_model
         'pos_encoding_type': 'sinusoidal',
         'dropout_rate': 0.1,
         'learning_rate': 1e-3,
-        'num_epochs': 10,
-        'batch_size': 4,
-        'max_len': 50,
+        'num_epochs': args.num_epochs,
+        'batch_size': args.batch_size,
+        'max_len': args.max_len,
         'tokenization_level': 'word',
         'min_token_freq': 1
     }
     
     # Paths
-    data_dir = 'raw_data'
-    save_dir = 'models'
+    data_dir = args.data_dir
+    save_dir = args.model_dir
     
     print("=" * 50)
     print("Transformer Training Pipeline")
@@ -207,6 +230,13 @@ def main():
     # Create model
     print("\n2. Creating model...")
     model = create_model(len(vocab), config['max_len'], config)
+    
+    # Build the model by calling it with sample inputs
+    # This is necessary before counting parameters
+    sample_src = tf.zeros((1, config['max_len']), dtype=tf.int32)
+    sample_tgt = tf.zeros((1, config['max_len']), dtype=tf.int32)
+    _ = model(sample_src, sample_tgt, training=False)
+    
     print(f"   Model created with {model.count_params():,} parameters")
     
     # Train model
