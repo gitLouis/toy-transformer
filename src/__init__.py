@@ -29,6 +29,7 @@ from .data_preprocessing import (
     preprocess_data
 )
 from .model_utils import load_model
+from .gutenberg_downloader import GutenbergDownloader, download_top_k
 
 __all__ = [
     'Transformer',
@@ -57,4 +58,6 @@ __all__ = [
     'create_sequence_pairs',
     'preprocess_data',
     'load_model',
+    'GutenbergDownloader',
+    'download_top_k',
 ]

@@ -39,7 +39,8 @@ toy-transformer/
 │   ├── training.py            # Loss function & training step
 │   ├── inference.py           # Greedy decoding
 │   ├── data_preprocessing.py  # Text preprocessing utilities
-│   └── model_utils.py         # Model save/load utilities
+│   ├── model_utils.py         # Model save/load utilities
+│   └── gutenberg_downloader.py # Project Gutenberg book downloader
 ├── tests/
 │   ├── test_layers.py
 │   ├── test_positional_encoding.py
@@ -56,6 +57,7 @@ toy-transformer/
 │   └── sample3.txt
 ├── models/                   # Saved trained models (created after training)
 ├── train.py                  # Training script
+├── download_gutenberg.py     # Gutenberg book downloader script
 ├── requirements.txt          # Python dependencies
 ├── Dockerfile                # Docker configuration
 ├── setup_venv.sh             # Virtual environment setup script
@@ -106,6 +108,27 @@ pip install -r requirements.txt
 
 # Or using the setup script (creates virtual environment)
 bash setup_venv.sh
+```
+
+### Downloading Books from Project Gutenberg
+
+To download books for training:
+
+```bash
+# Download top 5 books
+python download_gutenberg.py --k 5
+
+# Download top 10 books to a specific directory
+python download_gutenberg.py --k 10 --dir raw_data/gutenberg
+```
+
+Or use the Python API:
+
+```python
+from src import download_top_k
+
+# Download top 5 books
+download_top_k(k=5, download_dir='raw_data/gutenberg')
 ```
 
 ### Training a Model
